@@ -88,7 +88,8 @@ sub git-log (*@args, :@fields = @fields-default, IO::Path :$path,
     $text ~~ s/$commit-sep$//;
     # Remove the trailing newlines git adds
     $text ~~ s:g/$commit-sep\n/$commit-sep/;
-    my @commits;
+
+    my $commits := IterationBuffer.new;
     for $text.split($commit-sep) -> $entry {
         my %thing = %( @fields».key Z=> $entry.split($column-sep) );
         if $date-time {
@@ -96,8 +97,10 @@ sub git-log (*@args, :@fields = @fields-default, IO::Path :$path,
                 %thing{$key} = DateTime.new(%thing{$key});
             }
         }
-        @commits.push: %thing;
+        $commits.push: %thing;
     }
+
+    my @commits := $commits.List;
     if $get-changes {
         my $stat-proc = run 'git', @log-arg, '--numstat', "--format=$commit-sep%H", @args, :out;
         my $stat-text = $stat-proc.out.slurp;
@@ -108,11 +111,11 @@ sub git-log (*@args, :@fields = @fields-default, IO::Path :$path,
         $stat-text ~~ s/^$commit-sep//;
         my %commit-data;
         $stat-text.split($commit-sep).map({ get-data($_, %commit-data) });
-        for @commits -> $commit {
+        for $commits -> $commit {
             $commit<changes> = %commit-data{$commit<ID>};
         }
     }
-    @commits;
+    @commits
 }
 
 sub get-data (Str:D $str, %commit-data) {

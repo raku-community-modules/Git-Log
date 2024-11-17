@@ -1,7 +1,10 @@
 Revision history for Git-Log
 
 {{$NEXT}}
+
+0.2.1  2024-11-17T19:58:21+01:00
     - Initial version as a Raku Community Module
+    - Return hashes without being itemized
 
 ## [0.2.0] - 2018-08-25
 - :get-changes is now off by default
