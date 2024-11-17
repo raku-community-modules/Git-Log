@@ -1,58 +1,60 @@
-#! /usr/bin/env false
-
-use v6.c;
-
 unit module Git::Log;
 
 =begin pod
 
-=NAME    Git::Log
-=AUTHOR  Samantha McVey (samcv) <samantham@posteo.net>
+=head1 NAME
+
+Git::Log - Gets the git log as a Raku object
 
 =head1 SYNOPSIS
 
-Gets the git log as a Perl 6 object
+Gets the git log as a Raku object
+
 =head1 DESCRIPTION
-=para
+
 The first argument is the command line args wanted to be passed into C<git log>.
 Optionally you can also get the files changes as well as the number of lines
 added or deleted.
-=para
+
 Returns an array of hashes in the following format:
 C<<ID => "df0c229ad6ba293c67724379bcd3d55af6ea47a0",
 AuthorName => "Author's Name", AuthorEmail => "sample.email@not-a.url" ...>>
-If the option :get-changes is used (off by default) it will also add a 'changes' key in the
-following format: C<<changes => { $[ { filename => 'myfile.txt', added => 10, deleted => 5 }, ... ] }>>
 
-=para
+If the option :get-changes is used (off by default) it will also add
+a 'changes' key in the following format: C<<changes => { $[ { filename => 'myfile.txt', added => 10, deleted => 5 }, ... ] }>>
+
 If there is a field that you need that is not offered, then you can supply an
 array, :@fields. Format is an array of pairs: C<<ID => '%H', AuthorName => '%an' ...>>
 you can look for more L<here|https://git-scm.com/docs/pretty-formats>.
 
-=para
 These are the default fields:
-=begin code :lang<perl6>
+
+=begin code :lang<raku>
+
 my @fields-default =
-    'ID'           => '%H',
-    'AuthorName'   => '%an',
-    'AuthorEmail'  => '%ae',
-    'AuthorDate'   => '%aI',
-    'Subject'      => '%s',
-    'Body'         => '%b'
+  ID          => '%H',
+  AuthorName  => '%an',
+  AuthorEmail => '%ae',
+  AuthorDate  => '%aI',
+  Subject     => '%s',
+  Body        => '%b'
 ;
+
 =end code
+
 =head1 EXAMPLES
-=begin code :lang<perl6>
-# Gets the git log for the specified repository, from versions 2018.06 to master
-git-log(:path($path.IO), '2018.06..master')
+
+=begin code :lang<raku>
+
+# Gets the git log for the specified repository,
+# from versions 2018.06 to main
+git-log(:path($path.IO), '2018.06..main')
+
 # Gets the git log for the current directory, and does I<not> get the files
 # changed in that commit
 git-log(:!get-changes)
-=end code
 
-=LICENSE
-This is free software; you can redistribute it and/or modify it under
-the Artistic License 2.0.
+=end code
 
 =end pod
 
@@ -67,6 +69,7 @@ my @fields-default =
 # Private use characters which let us separate fields.
 my $column-sep = 0x102B7C.chr;
 my $commit-sep = 0x102B7D.chr;
+
 #| git-log's first argument is an array that is passed to C<git log> and
 #| optionally you can provide a path so a directory other than the current
 #| are used.
@@ -124,4 +127,23 @@ sub get-data (Str:D $str, %commit-data) {
     }
 }
 
-# vim: ft=perl6 noet
+=begin pod
+
+=head1 AUTHOR
+
+Samantha McVey
+
+Source can be located at: https://github.com/raku-community-modules/Git-Log .
+Comments and Pull Requests are welcome.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2018 Samantha McVey
+
+Copyright 2024 The Raku Community
+
+This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
+
+=end pod
+
+# vim: expandtab shiftwidth=4
